@@ -12,7 +12,7 @@ class myApp extends StatelessWidget{
       title:'移动互联网实验1',
       home: Scaffold(
         appBar: AppBar(
-          title: Text('第7组第一次实验'),
+          title: Text('第8组移动互联网实验'),
         ),
         body: MyWidget(),
       ),
