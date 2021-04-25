@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutterapp1/5120182572/findPassword.dart';
 import 'package:flutterapp1/5120182572/index.dart';
 import 'package:flutterapp1/5120182572/regist.dart';
+import 'package:flutterapp1/_user/index.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class login001 extends StatefulWidget {
   @override
@@ -36,6 +39,7 @@ class login001State extends State<login001> {
         body: Stack(
           children: [
             Container(
+              color: Colors.black,
                 margin: EdgeInsets.fromLTRB(25, 70, 25, 0),
                 child: Form(
                   key: loginFormKey,
@@ -102,7 +106,7 @@ class login001State extends State<login001> {
                               setState(() {
                                 flag = false;
                               });
-                              return '请正确设置新密码，密码由6-18位数字、英文或特殊字符(.!@#\$%^&*)组成!';
+                              return '请正确输入密码，密码由6-18位数字、英文或特殊字符(.!@#\$%^&*)组成!';
                             } else {
                               setState(() {
                                 flag = true;
@@ -173,7 +177,10 @@ class login001State extends State<login001> {
                   ),
                   Text('|'),
                   FlatButton(
-                    onPressed: () => {},
+                    onPressed: () => {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => findPassword()))
+                    },
                     child: Text('找回密码',
                         style: TextStyle(
                           fontSize: 12,
@@ -186,11 +193,36 @@ class login001State extends State<login001> {
         ));
   }
 
-  void _login() {
-    print({'phone': phoneController.text, 'password': passController.text});
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => indexPage()));
-//      onTextClear();
+  void _login() async{
+    var data = {"phone": phoneController.text, "password": passController.text};
+    print(checkUser(data));
+    if(checkUser(data)){
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setString('phone',phoneController.text);
+      prefs.setString('password',passController.text);
+      Navigator.push(context, MaterialPageRoute(builder: (context) => indexPage()));
+    }else{
+      showDialog(context: context, builder: (BuildContext context) {
+        return new AlertDialog(
+          title: new Text('提示'),
+          content: new SingleChildScrollView(
+            child: new ListBody(
+              children: <Widget>[
+                new Text('账号或密码出错，请检查后再登陆'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text('确定'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      });
+    }
   }
 
   void onTextClear() {

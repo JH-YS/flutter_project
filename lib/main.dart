@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutterapp1/5120182572/index.dart';
 import '5120182572/_login_001.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  //原有android项目集成flutter运行报错MissingPluginException(No implementation found for method getAll on channel
+  //在使用网上的方法后，错误为MissingPluginException(No implementation found for method getAll on channel
+  SharedPreferences.setMockInitialValues({});
   runApp(myApp());
 }
 
@@ -35,7 +40,7 @@ class MyWidget extends StatelessWidget{
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context)=> login001())
+                      builder: (context)=> indexPage())
               );
             },
           )
