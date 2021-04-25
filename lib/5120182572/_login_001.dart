@@ -39,7 +39,6 @@ class login001State extends State<login001> {
         body: Stack(
           children: [
             Container(
-              color: Colors.black,
                 margin: EdgeInsets.fromLTRB(25, 70, 25, 0),
                 child: Form(
                   key: loginFormKey,
