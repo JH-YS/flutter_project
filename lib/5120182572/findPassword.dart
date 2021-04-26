@@ -1,7 +1,9 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterapp1/5120182572/_login_001.dart';
 import 'package:flutterapp1/5120182572/index.dart';
+import 'package:flutterapp1/_user/index.dart';
 
 class findPassword extends StatefulWidget {
   @override
@@ -11,10 +13,8 @@ class findPassword extends StatefulWidget {
 class findPasswordState extends State<findPassword> {
   //手机号的控制器
   TextEditingController phoneController = TextEditingController();
-
-  //新密码的控制器
-  TextEditingController passController = TextEditingController();
-  TextEditingController passCheckController = TextEditingController();
+  TextEditingController questionController = TextEditingController();
+  TextEditingController answerController = TextEditingController();
   GlobalKey<FormState> findPasswordFormKey = new GlobalKey<FormState>();
 
   void initState() {
@@ -23,8 +23,10 @@ class findPasswordState extends State<findPassword> {
 
   var passwordVisible = true; //设置初始状态
   var passwordCheckVisible = true; //设置初始状态
-  var flag = false;
-  RegExp phoneExp = RegExp(r'^1[34578]\d{9}$|^1((99)|(66)|(98)|(91)|(65))\d{8}$');
+  var formCheckFlag = false;
+  var questionVisible = false;
+  RegExp phoneExp =
+      RegExp(r'^1[34578]\d{9}$|^1((99)|(66)|(98)|(91)|(65))\d{8}$');
   RegExp passwordExp = RegExp(r'^(?:\d|[a-zA-Z]|[.!@#$%^&*]){6,18}$');
 
   @override
@@ -32,19 +34,33 @@ class findPasswordState extends State<findPassword> {
     return Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
-          title: Text('findPassword页面/5120182572朱俊翰'),
+          title: Text('找回密码/5120182572朱俊翰'),
         ),
         body: Stack(
           children: [
             Container(
-              margin: EdgeInsets.fromLTRB(25, 70, 25, 0),
-              child:  Form(
+                child: Padding(
+              padding: EdgeInsets.all(30),
+              child: Form(
                   key: findPasswordFormKey,
-                  child:Column(
+                  child: Column(
                     children: <Widget>[
                       Container(
-                        color: Colors.grey,
-                        child: Text('app logo'),
+                        //设置容器大小
+                        width: double.maxFinite,
+                        height: 100,
+                        margin: EdgeInsets.fromLTRB(0, 0, 0, 50),
+                        decoration: (BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            //可以设置角度，BoxShape.circle直接圆形
+                            borderRadius: BorderRadius.circular(4),
+                            image: DecorationImage(
+                              fit: BoxFit.fill,
+                              image: AssetImage(
+                                "images/logo.png",
+                              ),
+                            ))),
+                        child: Text(''),
                       ),
                       TextFormField(
                         inputFormatters: [
@@ -53,24 +69,31 @@ class findPasswordState extends State<findPassword> {
                         maxLength: 11,
                         controller: phoneController,
                         keyboardType: TextInputType.number,
-                        onChanged: (e) {
+                        onChanged: (value) {
+                          bool phoneMatched = phoneExp.hasMatch(value);
                           findPasswordFormKey.currentState.validate();
+                          if (!phoneMatched) {
+                            setState(() {
+                              questionVisible = false;
+                              formCheckFlag = false;
+                            });
+                          }
                         },
                         validator: (value) {
                           bool phoneMatched = phoneExp.hasMatch(value);
                           if (value.length == 0) {
                             setState(() {
-                              flag = false;
+                              formCheckFlag = false;
                             });
                             return '手机号不可为空';
                           } else if (!phoneMatched) {
                             setState(() {
-                              flag = false;
+                              formCheckFlag = false;
                             });
                             return '请正确输入手机号(11位)';
                           } else {
                             setState(() {
-                              flag = true;
+                              formCheckFlag = true;
                             });
                             return null;
                           }
@@ -78,121 +101,82 @@ class findPasswordState extends State<findPassword> {
                         decoration: InputDecoration(
                           contentPadding: EdgeInsets.all(10.0),
                           icon: Icon(Icons.phone),
-                          labelText: '请输入手机号码',
+                          labelText: '请输入手机号码以供查询',
                         ),
                         autofocus: false,
                       ),
-                      TextFormField(
-                          controller: passController,
-                          keyboardType: TextInputType.text,
-                          maxLength: 16,
-                          onChanged: (e) {
-                            findPasswordFormKey.currentState.validate();
-                          },
-                          validator: (value) {
-                            bool passwordMatched = passwordExp.hasMatch(value);
-                            if (value.length == 0) {
-                              setState(() {
-                                flag = false;
-                              });
-                              return '新密码不可为空';
-                            } else if (value.length < 6) {
-                              setState(() {
-                                flag = false;
-                              });
-                              return '新密码长度不得低于6位';
-                            } else if (!passwordMatched) {
-                              setState(() {
-                                flag = false;
-                              });
-                              return '请正确设置新密码，新密码由6-18位数字、英文或特殊字符(.!@#\$%^&*)组成!';
-                            } else {
-                              setState(() {
-                                flag = true;
-                              });
-                              return null;
-                            }
-                          },
-                          decoration: InputDecoration(
-                            contentPadding: EdgeInsets.all(10.0),
-                            icon: Icon(Icons.lock),
-                            labelText: '请设置新密码',
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                //根据passwordVisible状态显示不同的图标
-                                passwordVisible
-                                    ? Icons.visibility
-                                    : Icons.visibility_off,
-                                color: Theme.of(context).primaryColorDark,
-                              ),
-                              onPressed: () {
-                                //更新状态控制新密码显示或隐藏
-                                setState(() {
-                                  passwordVisible = !passwordVisible;
-                                });
-                              },
-                            ),
-                          ),
-                          obscureText: !passwordVisible),
-                      TextFormField(
-                          controller: passCheckController,
-                          keyboardType: TextInputType.text,
-                          maxLength: 16,
-                          onChanged: (e) {
-                            findPasswordFormKey.currentState.validate();
-                          },
-                          validator: (value) {
-                            if (value.length == 0) {
-                              setState(() {
-                                flag = false;
-                              });
-                              return '新密码不可为空';
-                            } else if (value != passController.text) {
-                              setState(() {
-                                flag = false;
-                              });
-                              return '与所设新密码不一致';
-                            } else {
-                              setState(() {
-                                flag = true;
-                              });
-                              return null;
-                            }
-                          },
-                          decoration: InputDecoration(
-                            contentPadding: EdgeInsets.all(10.0),
-                            icon: Icon(Icons.lock),
-                            labelText: '再次输入新密码',
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                //根据passwordVisible状态显示不同的图标
-                                passwordCheckVisible
-                                    ? Icons.visibility
-                                    : Icons.visibility_off,
-                                color: Theme.of(context).primaryColorDark,
-                              ),
-                              onPressed: () {
-                                //更新状态控制新密码显示或隐藏
-                                setState(() {
-                                  passwordCheckVisible = !passwordCheckVisible;
-                                });
-                              },
-                            ),
-                          ),
-                          obscureText: !passwordCheckVisible),
+                      Visibility(
+                          visible: questionVisible,
+                          child: Column(
+                            children: [
+                              TextFormField(
+                                  controller: questionController,
+                                  keyboardType: TextInputType.text,
+                                  maxLength: 20,
+                                  onChanged: (e) {
+                                    findPasswordFormKey.currentState.validate();
+                                  },
+                                  validator: (value) {
+                                    if (value.length == 0) {
+                                      setState(() {
+                                        formCheckFlag = false;
+                                      });
+                                      return '密保问题不可为空';
+                                    } else {
+                                      setState(() {
+                                        formCheckFlag = true;
+                                      });
+                                      return null;
+                                    }
+                                  },
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.all(10.0),
+                                    icon: Icon(Icons.verified_user),
+                                    labelText: '密保问题',
+                                  )),
+                              TextFormField(
+                                  controller: answerController,
+                                  keyboardType: TextInputType.text,
+                                  maxLength: 20,
+                                  onChanged: (e) {
+                                    findPasswordFormKey.currentState.validate();
+                                  },
+                                  validator: (value) {
+                                    if (value.length == 0) {
+                                      setState(() {
+                                        formCheckFlag = false;
+                                      });
+                                      return '密保答案不可为空';
+                                    } else {
+                                      setState(() {
+                                        formCheckFlag = true;
+                                      });
+                                      return null;
+                                    }
+                                  },
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.all(10.0),
+                                    icon: Icon(Icons.question_answer_outlined),
+                                    labelText: '密保答案',
+                                  )),
+                            ],
+                          )),
                       Container(
-                        margin: EdgeInsets.fromLTRB(0, 50, 0, 0),
+                        margin: EdgeInsets.fromLTRB(0, 70, 0, 0),
                         child: RaisedButton(
                           disabledColor: Colors.grey,
                           shape: CircleBorder(
                               side: BorderSide(color: Colors.transparent)),
-                          color: Colors.blueAccent,
+                          color: Colors.black,
                           elevation: 5,
-                          onPressed: flag ? null : _findPassword,
+                          onPressed: formCheckFlag ? _findPassword : null,
                           child: Center(
                             child: Icon(
-                              Icons.arrow_right_alt_outlined,
-                              color: Colors.white,
+                              questionVisible
+                                  ? Icons.send_rounded
+                                  : Icons.search_rounded,
+                              color:
+                                  formCheckFlag ? Colors.orange : Colors.white,
                             ),
                           ),
                         ),
@@ -200,15 +184,110 @@ class findPasswordState extends State<findPassword> {
                         height: 65,
                       ),
                     ],
-                  )
-              ),
-            )
+                  )),
+            ))
           ],
         ));
   }
 
-  void _findPassword() {
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => indexPage()));
+  void _checkUser() async {
+    var data = {"phone": phoneController.text};
+    var user = new User(data);
+    var checkUserFlag = await user.checkUser();
+    if (checkUserFlag) {
+      var userInfo = await user.getInfo();
+      setState(() {
+        questionVisible = true;
+        formCheckFlag = false;
+        questionController.text = userInfo["question"];
+      });
+    } else {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return new AlertDialog(
+              title: new Text('提示'),
+              content: new SingleChildScrollView(
+                child: new ListBody(
+                  children: <Widget>[
+                    new Text('账号不存在'),
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                new FlatButton(
+                  child: new Text('确定'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          });
+    }
+  }
+
+  _findPassword() async {
+    if (!questionVisible) {
+      _checkUser();
+      return;
+    }
+
+    var data = {
+      "phone": phoneController.text,
+      "question": questionController.text,
+      "answer": answerController.text
+    };
+    var user = new User(data);
+    //判断密保正误,对了就初始化密码，并提示密码已被初始化，点击确定跳转到登陆页面
+    if (await user.checkQuestionAnswer()) {
+      user.passwordInit();
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return new AlertDialog(
+              title: new Text('提示'),
+              content: new SingleChildScrollView(
+                child: new ListBody(
+                  children: <Widget>[
+                    new Text('密保答案正确，密码已被初始化为123456，请立即登陆'),
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                new FlatButton(
+                  child: new Text('确定'),
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => login001()));
+                  },
+                ),
+              ],
+            );
+          });
+    } else {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return new AlertDialog(
+              title: new Text('提示'),
+              content: new SingleChildScrollView(
+                child: new ListBody(
+                  children: <Widget>[
+                    new Text('密保答案不正常，请重试'),
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                new FlatButton(
+                  child: new Text('确定'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          });
+    }
   }
 }
