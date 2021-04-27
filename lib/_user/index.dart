@@ -26,19 +26,17 @@ class User {
   add(context) async{
     var file = await this.getUserFile();
     var content = file.readAsStringSync();
-    var userList=[];
+    var userList = convert.jsonDecode(content);
     var theLastElement;
     var userId = 1;
-
     if(userList.isNotEmpty){
       var userIsExsist = await this.checkUser();
       // 先判断该手机号是否已经存在
       if(userIsExsist){
         return false;
       }
-      userList = convert.jsonDecode(content);
       theLastElement = userList.last;
-      userId = int.parse(theLastElement["user_id"])+1;
+      userId = theLastElement["user_id"]+1;
     }
     var userData = {
       "user_id":userId,
